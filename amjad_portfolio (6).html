@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Amjad Almehmadi — Data & Business Analyst</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --bg2: #111118;
+    --bg3: #1a1a26;
+    --accent: #a78bfa;
+    --accent2: #34d399;
+    --accent3: #f59e0b;
+    --text: #f0f0f8;
+    --muted: #8884a8;
+    --border: rgba(167,139,250,0.15);
+    --card: rgba(26,26,38,0.8);
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* --- NOISE TEXTURE --- */
+  body::before {
+    content:'';
+    position:fixed; inset:0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events:none; z-index:0;
+  }
+
+  /* --- GLOW BLOBS --- */
+  .blob {
+    position:fixed; border-radius:50%; filter:blur(100px);
+    pointer-events:none; z-index:0; opacity:0.18;
+  }
+  .blob1 { width:600px; height:600px; background:#7c3aed; top:-200px; right:-200px; }
+  .blob2 { width:500px; height:500px; background:#059669; bottom:-150px; left:-150px; }
+  .blob3 { width:300px; height:300px; background:#d97706; top:50%; left:40%; }
+
+  /* --- NAV --- */
+  nav {
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:1.25rem 3rem;
+    background:rgba(10,10,15,0.85);
+    backdrop-filter:blur(20px);
+    border-bottom:1px solid var(--border);
+  }
+  .nav-logo {
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px; color:var(--accent); letter-spacing:0.1em;
+  }
+  .nav-links { display:flex; gap:2rem; list-style:none; }
+  .nav-links a {
+    font-size:13px; color:var(--muted); text-decoration:none;
+    letter-spacing:0.05em; transition:color 0.2s;
+  }
+  .nav-links a:hover { color:var(--text); }
+
+  /* --- HERO --- */
+  .hero {
+    position:relative; z-index:1;
+    min-height:100vh;
+    display:flex; flex-direction:column; justify-content:center;
+    padding:8rem 3rem 4rem;
+    max-width:1100px; margin:0 auto;
+  }
+  .hero-tag {
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px; color:var(--accent2);
+    letter-spacing:0.15em; text-transform:uppercase;
+    margin-bottom:1.5rem;
+    opacity:0; animation: fadeUp 0.8s 0.2s forwards;
+  }
+  .hero h1 {
+    font-family:'Playfair Display', serif;
+    font-size:clamp(3rem, 7vw, 6rem);
+    font-weight:700; line-height:1.1;
+    margin-bottom:1rem;
+    opacity:0; animation: fadeUp 0.8s 0.4s forwards;
+  }
+  .hero h1 span { color:var(--accent); }
+  .hero-sub {
+    font-size:1.15rem; color:var(--muted); max-width:580px;
+    margin-bottom:2.5rem;
+    opacity:0; animation: fadeUp 0.8s 0.6s forwards;
+  }
+  .hero-btns {
+    display:flex; gap:1rem; flex-wrap:wrap;
+    opacity:0; animation: fadeUp 0.8s 0.8s forwards;
+  }
+  .btn {
+    padding:0.75rem 1.75rem; border-radius:6px;
+    font-size:13px; font-weight:500; cursor:pointer;
+    text-decoration:none; letter-spacing:0.05em;
+    transition: all 0.2s;
+  }
+  .btn-primary {
+    background:var(--accent); color:#0a0a0f; border:none;
+  }
+  .btn-primary:hover { background:#c4b5fd; transform:translateY(-2px); }
+  .btn-ghost {
+    background:transparent; color:var(--text);
+    border:1px solid var(--border);
+  }
+  .btn-ghost:hover { border-color:var(--accent); color:var(--accent); transform:translateY(-2px); }
+
+  .hero-stats {
+    display:flex; gap:3rem; margin-top:5rem;
+    opacity:0; animation: fadeUp 0.8s 1s forwards;
+  }
+  .stat-item { }
+  .stat-num {
+    font-family:'Playfair Display', serif;
+    font-size:2.5rem; font-weight:700; color:var(--accent);
+    line-height:1;
+  }
+  .stat-label { font-size:12px; color:var(--muted); letter-spacing:0.08em; margin-top:4px; }
+
+  /* --- SCROLL INDICATOR --- */
+  .scroll-hint {
+    position:absolute; bottom:3rem; left:3rem;
+    display:flex; align-items:center; gap:10px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px; color:var(--muted); letter-spacing:0.1em;
+    animation: fadeUp 1s 1.2s forwards; opacity:0;
+  }
+  .scroll-line {
+    width:40px; height:1px; background:var(--muted);
+    animation: expandLine 1.5s 1.5s infinite;
+  }
+
+  /* --- SECTIONS --- */
+  section {
+    position:relative; z-index:1;
+    max-width:1100px; margin:0 auto;
+    padding:6rem 3rem;
+  }
+  .section-tag {
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px; color:var(--accent);
+    letter-spacing:0.2em; text-transform:uppercase;
+    margin-bottom:1rem;
+  }
+  .section-title {
+    font-family:'Playfair Display', serif;
+    font-size:clamp(2rem, 4vw, 3rem);
+    font-weight:700; margin-bottom:3rem;
+    line-height:1.2;
+  }
+
+  /* --- ABOUT --- */
+  .about-grid {
+    display:grid; grid-template-columns:1fr 1fr; gap:4rem; align-items:start;
+  }
+  .about-text p { color:var(--muted); margin-bottom:1.25rem; font-size:1rem; }
+  .about-text strong { color:var(--text); }
+  .about-skills { }
+  .skill-category { margin-bottom:2rem; }
+  .skill-cat-title {
+    font-size:11px; letter-spacing:0.15em; text-transform:uppercase;
+    color:var(--accent2); margin-bottom:0.75rem;
+    font-family:'IBM Plex Mono', monospace;
+  }
+  .skill-tags { display:flex; flex-wrap:wrap; gap:8px; }
+  .skill-tag {
+    padding:5px 12px; border-radius:4px;
+    font-size:12px; font-weight:500;
+    border:1px solid var(--border); color:var(--muted);
+    background:var(--card); transition:all 0.2s;
+  }
+  .skill-tag:hover { border-color:var(--accent); color:var(--accent); }
+
+  /* --- PROJECTS --- */
+  .projects-grid {
+    display:grid; grid-template-columns:1fr 1fr; gap:1.5rem;
+  }
+  .project-card {
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:12px; padding:2rem;
+    transition:all 0.3s; cursor:default;
+    position:relative; overflow:hidden;
+  }
+  .project-card::before {
+    content:''; position:absolute; inset:0;
+    background:linear-gradient(135deg, rgba(167,139,250,0.05) 0%, transparent 60%);
+    opacity:0; transition:opacity 0.3s;
+  }
+  .project-card:hover { border-color:rgba(167,139,250,0.4); transform:translateY(-4px); }
+  .project-card:hover::before { opacity:1; }
+  .project-card.featured {
+    grid-column:span 2;
+    background:linear-gradient(135deg, rgba(124,58,237,0.1) 0%, var(--card) 50%);
+  }
+  .proj-number {
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px; color:var(--accent); letter-spacing:0.1em;
+    margin-bottom:1rem;
+  }
+  .proj-title {
+    font-family:'Playfair Display', serif;
+    font-size:1.4rem; font-weight:600; margin-bottom:0.75rem;
+    line-height:1.3;
+  }
+  .proj-desc { font-size:14px; color:var(--muted); margin-bottom:1.25rem; line-height:1.7; }
+  .proj-tools { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:1.25rem; }
+  .proj-tool {
+    padding:3px 10px; background:rgba(167,139,250,0.1);
+    border:1px solid rgba(167,139,250,0.2); border-radius:3px;
+    font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--accent);
+  }
+  .proj-kpi {
+    display:flex; gap:1.5rem; padding-top:1rem;
+    border-top:1px solid var(--border);
+  }
+  .kpi { }
+  .kpi-val { font-weight:600; color:var(--accent3); font-size:1.1rem; }
+  .kpi-label { font-size:11px; color:var(--muted); }
+  .proj-link {
+    display:inline-flex; align-items:center; gap:6px;
+    font-size:12px; color:var(--accent2); text-decoration:none;
+    font-family:'IBM Plex Mono', monospace; letter-spacing:0.05em;
+    margin-top:1rem; transition:gap 0.2s;
+  }
+  .proj-link:hover { gap:10px; }
+
+  /* --- EXPERIENCE --- */
+  .timeline { position:relative; }
+  .timeline::before {
+    content:''; position:absolute;
+    right:0; top:0; bottom:0; width:1px;
+    background:linear-gradient(to bottom, transparent, var(--border), transparent);
+  }
+  .timeline-item {
+    display:grid; grid-template-columns:1fr 1fr;
+    gap:3rem; margin-bottom:3rem; align-items:start;
+  }
+  .timeline-meta { text-align:left; padding-left:2rem; }
+  .timeline-period {
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px; color:var(--accent); letter-spacing:0.1em;
+  }
+  .timeline-company { font-size:1.1rem; font-weight:500; margin:0.5rem 0; }
+  .timeline-location { font-size:13px; color:var(--muted); }
+  .timeline-content { padding-right:2rem; border-right:1px solid var(--border); }
+  .timeline-role {
+    font-family:'Playfair Display', serif;
+    font-size:1.3rem; font-weight:600; margin-bottom:0.75rem;
+  }
+  .timeline-points { list-style:none; }
+  .timeline-points li {
+    font-size:14px; color:var(--muted); padding:4px 0;
+    display:flex; align-items:flex-start; gap:8px;
+  }
+  .timeline-points li::before {
+    content:'→'; color:var(--accent2); flex-shrink:0; margin-top:2px;
+    font-size:12px;
+  }
+
+  /* --- CERTS --- */
+  .certs-grid {
+    display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:1rem;
+  }
+  .cert-card {
+    background:var(--card); border:1px solid var(--border);
+    border-radius:8px; padding:1.25rem;
+    transition:all 0.2s;
+  }
+  .cert-card:hover { border-color:rgba(52,211,153,0.4); transform:translateY(-2px); }
+  .cert-icon { font-size:1.5rem; margin-bottom:0.75rem; }
+  .cert-name { font-size:14px; font-weight:500; margin-bottom:4px; }
+  .cert-provider { font-size:12px; color:var(--muted); }
+  .cert-date {
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px; color:var(--accent2);
+    margin-top:8px;
+  }
+
+  /* --- CONTACT --- */
+  .contact-wrapper {
+    display:grid; grid-template-columns:1fr 1fr; gap:4rem; align-items:center;
+  }
+  .contact-info { }
+  .contact-info p { color:var(--muted); margin-bottom:2rem; }
+  .contact-links { display:flex; flex-direction:column; gap:1rem; }
+  .contact-link {
+    display:flex; align-items:center; gap:12px;
+    text-decoration:none; color:var(--text);
+    padding:1rem 1.25rem;
+    background:var(--card); border:1px solid var(--border);
+    border-radius:8px; font-size:14px;
+    transition:all 0.2s;
+  }
+  .contact-link:hover { border-color:var(--accent); color:var(--accent); }
+  .contact-link-icon { font-size:1.1rem; }
+  .contact-quote {
+    background:var(--card); border:1px solid var(--border);
+    border-radius:12px; padding:2.5rem;
+    border-left:3px solid var(--accent);
+  }
+  .quote-text {
+    font-family:'Playfair Display', serif;
+    font-size:1.2rem; font-style:italic; line-height:1.7;
+    color:var(--text); margin-bottom:1.5rem;
+  }
+  .quote-author { font-size:13px; color:var(--muted); }
+  .quote-author strong { color:var(--accent2); }
+
+  /* --- FOOTER --- */
+  footer {
+    position:relative; z-index:1;
+    text-align:center; padding:2rem 3rem;
+    border-top:1px solid var(--border);
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px; color:var(--muted);
+  }
+
+  /* --- ANIMATIONS --- */
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(24px); }
+    to { opacity:1; transform:translateY(0); }
+  }
+  @keyframes expandLine {
+    0%,100% { width:40px; opacity:0.5; }
+    50% { width:60px; opacity:1; }
+  }
+
+  /* --- DIVIDER --- */
+  .section-divider {
+    max-width:1100px; margin:0 auto;
+    border:none; border-top:1px solid var(--border);
+  }
+
+  /* --- MODAL --- */
+  .modal-overlay {
+    display:none;
+    width:100%; margin-top:1rem;
+    background:#13131f; border:1px solid var(--border);
+    border-radius:12px; overflow:hidden;
+    animation: modalIn 0.3s ease;
+  }
+  .modal-overlay.active { display:block; }
+  @keyframes modalIn {
+    from { opacity:0; transform:translateY(-10px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  .modal-header {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:1rem 1.5rem; border-bottom:1px solid var(--border);
+    background:#13131f;
+  }
+  .modal-title {
+    font-family:'Playfair Display', serif;
+    font-size:1rem; font-weight:600; color:var(--text);
+  }
+  .modal-close {
+    width:28px; height:28px; border-radius:50%;
+    background:rgba(255,255,255,0.05); border:1px solid var(--border);
+    color:var(--muted); font-size:16px; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    transition:all 0.2s;
+  }
+  .modal-close:hover { background:rgba(255,255,255,0.12); color:var(--text); }
+  .modal-body { padding:1.5rem; }
+  .modal-gallery { display:grid; grid-template-columns:1fr; gap:1rem; }
+  .modal-gallery img {
+    width:100%; border-radius:8px;
+    border:1px solid var(--border); display:block;
+  }
+  .modal-desc {
+    margin-top:1.25rem; padding-top:1.25rem;
+    border-top:1px solid var(--border);
+    font-size:13px; color:var(--muted); line-height:1.8;
+  }
+  .proj-view-btn {
+    display:inline-flex; align-items:center; gap:6px;
+    margin-top:1rem; padding:7px 16px;
+    background:rgba(167,139,250,0.1); border:1px solid rgba(167,139,250,0.3);
+    border-radius:6px; font-size:12px; color:var(--accent);
+    font-family:'IBM Plex Mono', monospace; cursor:pointer;
+    transition:all 0.2s; letter-spacing:0.05em;
+  }
+  .proj-view-btn:hover { background:rgba(167,139,250,0.2); }
+
+  /* --- RESPONSIVE --- */
+  @media (max-width:768px) {
+    nav { padding:1rem 1.5rem; }
+    .nav-links { display:none; }
+    .hero { padding:7rem 1.5rem 3rem; }
+    .hero-stats { flex-wrap:wrap; gap:2rem; }
+    section { padding:4rem 1.5rem; }
+    .about-grid,
+    .projects-grid,
+    .timeline-item,
+    .contact-wrapper { grid-template-columns:1fr; }
+    .project-card.featured { grid-column:span 1; }
+    .timeline-content { padding-right:0; border-right:none; }
+    .timeline-meta { padding-left:0; }
+    .modal-box { max-height:95vh; }
+    .modal-body { padding:1.25rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="blob blob1"></div>
+<div class="blob blob2"></div>
+<div class="blob blob3"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">AA.portfolio</div>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#experience">Experience</a></li>
+    <li><a href="#certifications">Certifications</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div style="position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:0 3rem;">
+  <div class="hero">
+    <div class="hero-tag">// Data & Business Analyst · MIS Graduate</div>
+    <h1>Amjad<br><span>Almehmadi</span></h1>
+    <p class="hero-sub">Turning messy data into clear, beautiful, and actionable stories — bridging complex numbers with smart business decisions using Power BI, SQL, and advanced analytics.</p>
+    <div class="hero-btns">
+      <a href="#projects" class="btn btn-primary">View Projects</a>
+      <a href="#contact" class="btn btn-ghost">Get In Touch</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-item">
+        <div class="stat-num">3+</div>
+        <div class="stat-label">Years Experience</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">3</div>
+        <div class="stat-label">Major Projects</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">4</div>
+        <div class="stat-label">Certifications</div>
+      </div>
+    </div>
+    <div class="scroll-hint">
+      <div class="scroll-line"></div>
+      SCROLL
+    </div>
+  </div>
+</div>
+
+<hr class="section-divider">
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="section-tag">// 01 — About</div>
+  <h2 class="section-title">Who I Am</h2>
+  <div class="about-grid">
+    <div class="about-text">
+      <p>I'm <strong>Amjad Almehmadi</strong>, a Management Information Systems graduate from Yanbu Industrial College with a deep passion for transforming raw data into strategic business intelligence.</p>
+      <p>My journey spans from a <strong>COOP internship at Saudi Aramco</strong> where I managed workforce dashboards, to working as a <strong>Governance & Administrative Assistant</strong> at Al-Hamra Company, designing KPI frameworks and driving data-informed decisions.</p>
+      <p>I specialize in building end-to-end analytical solutions — from data modeling and ETL pipelines to executive-ready Power BI dashboards with polished UI/UX.</p>
+      <p style="color:var(--accent2); font-style:italic;">"I enjoy building dashboards, analyzing business performance, and turning data into actionable insights."</p>
+    </div>
+    <div class="about-skills">
+      <div class="skill-category">
+        <div class="skill-cat-title">Data Analytics</div>
+        <div class="skill-tags">
+          <span class="skill-tag">Power BI</span>
+          <span class="skill-tag">DAX</span>
+          <span class="skill-tag">SQL</span>
+          <span class="skill-tag">Tableau</span>
+          <span class="skill-tag">R</span>
+          <span class="skill-tag">Python</span>
+          <span class="skill-tag">Excel</span>
+        </div>
+      </div>
+      <div class="skill-category">
+        <div class="skill-cat-title">Business Intelligence</div>
+        <div class="skill-tags">
+          <span class="skill-tag">Power Query</span>
+          <span class="skill-tag">SAP ERP</span>
+          <span class="skill-tag">Data Modeling</span>
+          <span class="skill-tag">KPI Design</span>
+          <span class="skill-tag">ETL</span>
+        </div>
+      </div>
+      <div class="skill-category">
+        <div class="skill-cat-title">Development & Design</div>
+        <div class="skill-tags">
+          <span class="skill-tag">UI/UX Design</span>
+          <span class="skill-tag">Java</span>
+          <span class="skill-tag">HTML/CSS</span>
+          <span class="skill-tag">MySQL</span>
+          <span class="skill-tag">Visual Studio</span>
+        </div>
+      </div>
+      <div class="skill-category">
+        <div class="skill-cat-title">Languages</div>
+        <div class="skill-tags">
+          <span class="skill-tag">Arabic — Native</span>
+          <span class="skill-tag">English — Proficient</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="section-tag">// 02 — Projects</div>
+  <h2 class="section-title">Selected Work</h2>
+  <div class="projects-grid">
+
+    <!-- Project 1 — Featured -->
+    <div class="project-card featured">
+      <div class="proj-number">01 / Featured</div>
+      <div class="proj-title">HR Analytics & Workforce Strategy</div>
+      <p class="proj-desc">Built an end-to-end Power BI dashboard analyzing 96,000 employees covering workforce performance, retention, payroll, and employee well-being. Delivered executive-focused insights with dark mode UI and smart navigation.</p>
+      <div class="proj-tools">
+        <span class="proj-tool">Power BI</span>
+        <span class="proj-tool">DAX</span>
+        <span class="proj-tool">Power Query</span>
+        <span class="proj-tool">M Language</span>
+        <span class="proj-tool">UI/UX</span>
+      </div>
+      <div class="proj-kpi">
+        <div class="kpi"><div class="kpi-val">96K</div><div class="kpi-label">Employees Analyzed</div></div>
+        <div class="kpi"><div class="kpi-val">$615M</div><div class="kpi-label">Payroll Tracked</div></div>
+        <div class="kpi"><div class="kpi-val">10%</div><div class="kpi-label">Attrition Rate KPI</div></div>
+        <div class="kpi"><div class="kpi-val">3.00</div><div class="kpi-label">Avg Performance Score</div></div>
+      </div>
+    </div>
+
+    <!-- Project 2 -->
+    <div class="project-card">
+      <div class="proj-number">02</div>
+      <div class="proj-title">Airline Customer Experience & Operations Analytics</div>
+      <p class="proj-desc">Built a multi-page Power BI dashboard analyzing 1M+ passengers across satisfaction, service quality, customer segmentation, and delay operations. Delivered executive-ready insights with dark-mode UI and rich visual storytelling.</p>
+      <div class="proj-tools">
+        <span class="proj-tool">Power BI</span>
+        <span class="proj-tool">DAX</span>
+        <span class="proj-tool">Power Query</span>
+        <span class="proj-tool">UI/UX</span>
+        <span class="proj-tool">Storytelling</span>
+      </div>
+      <div class="proj-kpi">
+        <div class="kpi"><div class="kpi-val">1M+</div><div class="kpi-label">Passengers Analyzed</div></div>
+        <div class="kpi"><div class="kpi-val">43%</div><div class="kpi-label">Satisfaction Rate</div></div>
+        <div class="kpi"><div class="kpi-val">3.33</div><div class="kpi-label">Avg Service Rating</div></div>
+      </div>
+      <p class="proj-desc" style="font-style:italic; color:var(--accent3); font-size:13px; margin-top:1rem;">Key finding: WiFi service scored lowest (2.73) across all classes; Business Class passengers reported highest satisfaction. Returning passengers are significantly more satisfied than first-time travelers.</p>
+    </div>
+
+    <!-- Project 3 -->
+    <div class="project-card">
+      <div class="proj-number">03</div>
+      <div class="proj-title">Smart Room Booking System</div>
+      <p class="proj-desc">Graduation project developed during internship at Saudi Aramco (PL&DU). A web platform that replaced manual booking via calls and emails with an interactive real-time room reservation system.</p>
+      <div class="proj-tools">
+        <span class="proj-tool">Java</span>
+        <span class="proj-tool">HTML/CSS</span>
+        <span class="proj-tool">MySQL</span>
+        <span class="proj-tool">UI/UX</span>
+      </div>
+      <div class="proj-kpi">
+        <div class="kpi"><div class="kpi-val">∞→0</div><div class="kpi-label">Double Bookings</div></div>
+        <div class="kpi"><div class="kpi-val">hrs→sec</div><div class="kpi-label">Booking Time</div></div>
+      </div>
+    </div>
+
+    <!-- Project 4 -->
+    <div class="project-card">
+      <div class="proj-number">04</div>
+      <div class="proj-title">U.S. Aviation Delay Root Cause Analysis</div>
+      <p class="proj-desc">Analyzed flight delay patterns across major U.S. airports, categorizing causes into Weather, Maintenance, Airport Operations, and Security. Provided data-driven recommendations to improve scheduling reliability.</p>
+      <div class="proj-tools">
+        <span class="proj-tool">Excel</span>
+        <span class="proj-tool">SQL</span>
+        <span class="proj-tool">Tableau</span>
+      </div>
+    </div>
+
+    <!-- Project 5 -->
+    <div class="project-card">
+      <div class="proj-number">05</div>
+      <div class="proj-title">Transit & Transfer Movement Analysis — Prince Mohammad Bin Abdulaziz Airport 2025</div>
+      <p class="proj-desc">Developed a Power BI dashboard analyzing transit traffic through Prince Mohammad Bin Abdulaziz International Airport (Madinah) for 2025. Covered quarterly operational movements, top origin countries, busiest entry points, and geographic distribution of transit passengers.</p>
+      <div class="proj-tools">
+        <span class="proj-tool">Power BI</span>
+        <span class="proj-tool">DAX</span>
+        <span class="proj-tool">Power Query</span>
+        <span class="proj-tool">Azure Maps</span>
+        <span class="proj-tool">UI/UX</span>
+      </div>
+      <div class="proj-kpi">
+        <div class="kpi"><div class="kpi-val">579</div><div class="kpi-label">Total Transit Movements</div></div>
+        <div class="kpi"><div class="kpi-val">168%</div><div class="kpi-label">Quarterly Growth Rate</div></div>
+        <div class="kpi"><div class="kpi-val">80.14%</div><div class="kpi-label">Top Country Share (KSA)</div></div>
+        <div class="kpi"><div class="kpi-val">45.77%</div><div class="kpi-label">Top Entry Point Share</div></div>
+      </div>
+      <p class="proj-desc" style="font-style:italic; color:var(--accent3); font-size:13px; margin-top:1rem;">Key finding: Q4 recorded the highest movement (252), driven by Saudi domestic transit. Prince Mohammad Bin Abdulaziz Airport was the leading entry point at 45.77% of total movements.</p>
+      <button class="proj-view-btn" onclick="toggleModal('modal-p5', this)">↗ View Dashboard Screenshots</button>
+      <div class="modal-overlay" id="modal-p5">
+        <div class="modal-header">
+          <div class="modal-title">Madinah Airport — Dashboard Preview</div>
+          <button class="modal-close" onclick="toggleModal('modal-p5', null)">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="modal-gallery">
+            <img src="https://i.imgur.com/sme6Bhw.jpeg" alt="Madinah Airport Dashboard">
+          </div>
+          <div class="modal-desc">
+            <p>Power BI dashboard analyzing transit and transfer movement through Prince Mohammad Bin Abdulaziz International Airport (Madinah) for 2025 — quarterly trends, top origin countries, entry points, and geographic distribution.</p>
+            <p style="margin-top:0.75rem;"><strong style="color:var(--accent2);">Tools:</strong> Power BI · DAX · Power Query · Azure Maps · UI/UX</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- EXPERIENCE -->
+<section id="experience">
+  <div class="section-tag">// 03 — Experience</div>
+  <h2 class="section-title">Career Journey</h2>
+  <div class="timeline">
+
+    <div class="timeline-item">
+      <div class="timeline-content">
+        <div class="timeline-role">Governance & Administrative Assistant</div>
+        <ul class="timeline-points">
+          <li>Developed data governance frameworks ensuring accuracy and compliance</li>
+          <li>Designed and tracked KPIs to monitor operational performance</li>
+          <li>Delivered analytical reports supporting senior management decisions</li>
+          <li>Aligned administrative processes with data-driven strategic roadmaps</li>
+          <li>Updated governance policies to meet data privacy standards</li>
+        </ul>
+      </div>
+      <div class="timeline-meta">
+        <div class="timeline-period">APR 2026</div>
+        <div class="timeline-company">Al-Hamra Company</div>
+        <div class="timeline-location">Development Dept. — Al Madinah, KSA</div>
+      </div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-content">
+        <div class="timeline-role">Customer Service Agent</div>
+        <ul class="timeline-points">
+          <li>Assisted passengers during check-in and boarding operations</li>
+          <li>Proficient in DCS and passenger processing software</li>
+          <li>Expertise in Baggage Reconciliation (BRS) and ramp safety</li>
+          <li>Strong knowledge of IATA regulations and DGR awareness</li>
+          <li>Skilled in managing turnaround times and flight scheduling</li>
+        </ul>
+      </div>
+      <div class="timeline-meta">
+        <div class="timeline-period">MAY 2025</div>
+        <div class="timeline-company">Saudi Ground Services</div>
+        <div class="timeline-location">Prince Mohammad Bin Abdulaziz Airport — Al Madinah</div>
+      </div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-content">
+        <div class="timeline-role">COOP Trainee — Professional Learning & Development</div>
+        <ul class="timeline-points">
+          <li>Supported the Saudi Aramco STEP program for newly hired professionals</li>
+          <li>Managed weekly & monthly dashboards for program progress tracking</li>
+          <li>Performed data cleansing and organization for monthly reporting</li>
+          <li>Entered and managed employee training data in SAP ERP</li>
+          <li>Recognized for proactivity — training extended due to excellent performance</li>
+        </ul>
+      </div>
+      <div class="timeline-meta">
+        <div class="timeline-period">JAN 2023 – AUG 2023</div>
+        <div class="timeline-company">Saudi Aramco</div>
+        <div class="timeline-location">PL&DU — Dhahran, KSA</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- CERTIFICATIONS -->
+<section id="certifications">
+  <div class="section-tag">// 04 — Certifications</div>
+  <h2 class="section-title">Credentials</h2>
+  <div class="certs-grid">
+    <div class="cert-card">
+      <div class="cert-icon">🎓</div>
+      <div class="cert-name">Google Data Analytics Professional Certificate</div>
+      <div class="cert-provider">Google · Coursera</div>
+      <div class="cert-date">Jun 2024</div>
+    </div>
+    <div class="cert-card">
+      <div class="cert-icon">📊</div>
+      <div class="cert-name">Microsoft Excel Power BI Data Analytics</div>
+      <div class="cert-provider">Microsoft</div>
+      <div class="cert-date">May 2024</div>
+    </div>
+    <div class="cert-card">
+      <div class="cert-icon">🏆</div>
+      <div class="cert-name">Big Data</div>
+      <div class="cert-provider">Saudi Digital Academy</div>
+      <div class="cert-date">Nov 2023</div>
+    </div>
+    <div class="cert-card">
+      <div class="cert-icon">📈</div>
+      <div class="cert-name">Business Analytics Nanodegree</div>
+      <div class="cert-provider">Udacity × Saudi Digital Academy</div>
+      <div class="cert-date">Dec 2022</div>
+    </div>
+  </div>
+
+  <div style="margin-top:3rem; background:var(--card); border:1px solid var(--border); border-radius:12px; padding:2rem; display:grid; grid-template-columns:1fr 1fr; gap:2rem; align-items:center;">
+    <div>
+      <div class="section-tag" style="margin-bottom:0.5rem;">// Education</div>
+      <p style="font-size:1.1rem; font-weight:500; margin-bottom:6px;">Bachelor of Management Information Systems</p>
+      <p style="color:var(--muted); font-size:14px;">Yanbu Industrial College (YIC) · 2019 – 2023</p>
+      <p style="color:var(--muted); font-size:13px; margin-top:6px;">ERP Systems · Business Process Management · Data Analytics</p>
+    </div>
+    <div>
+      <p style="font-size:1.1rem; font-weight:500; margin-bottom:6px;">Diploma of Accounting</p>
+      <p style="color:var(--muted); font-size:14px;">Taibah University · 2017 – 2019</p>
+      <p style="color:var(--muted); font-size:13px; margin-top:6px;">Financial Analysis · Accounting Fundamentals</p>
+    </div>
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="section-tag">// 05 — Contact</div>
+  <h2 class="section-title">Let's Connect</h2>
+  <div class="contact-wrapper">
+    <div class="contact-info">
+      <p>Open to new opportunities in data analytics, business intelligence, and strategic decision support. Let's build something meaningful together.</p>
+      <div class="contact-links">
+        <a href="mailto:ialharbiamjaad@gmail.com" class="contact-link">
+          <span class="contact-link-icon">✉</span>
+          ialharbiamjaad@gmail.com
+        </a>
+        <a href="tel:+966556679183" class="contact-link">
+          <span class="contact-link-icon">☎</span>
+          +966 55 667 9183
+        </a>
+        <a href="https://linkedin.com/in/amjadalmehmadi" target="_blank" class="contact-link">
+          <span class="contact-link-icon">in</span>
+          linkedin.com/in/amjadalmehmadi
+        </a>
+        <div class="contact-link" style="cursor:default;">
+          <span class="contact-link-icon">📍</span>
+          Riyadh, Saudi Arabia
+        </div>
+      </div>
+    </div>
+    <div class="contact-quote">
+      <div class="quote-text">"Amjad is a talented and highly adaptable individual... she will contribute greatly to any organization choosing to employ her."</div>
+      <div class="quote-author"><strong>Martin J. Barrett</strong> — Supervisor, Saudi Aramco</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>© 2026 Amjad Almehmadi · Built with precision & data ✦ Riyadh, Saudi Arabia</p>
+</footer>
+
+<!-- MODAL moved inside project cards -->
+
+<script>
+  function toggleModal(id, btn) {
+    const modal = document.getElementById(id);
+    const isOpen = modal.classList.contains('active');
+    // close all modals first
+    document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active'));
+    if (!isOpen) modal.classList.add('active');
+  }
+
+  // Intersection Observer for scroll animations
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(el => {
+      if (el.isIntersecting) {
+        el.target.style.opacity = '1';
+        el.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.project-card, .cert-card, .timeline-item, .skill-category').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(20px)';
+    el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+    observer.observe(el);
+  });
+
+  // Smooth nav highlight
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.nav-links a');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(s => {
+      if (window.scrollY >= s.offsetTop - 200) current = s.id;
+    });
+    navLinks.forEach(a => {
+      a.style.color = a.getAttribute('href') === '#' + current ? 'var(--accent)' : '';
+    });
+  });
+</script>
+</body>
+</html>
